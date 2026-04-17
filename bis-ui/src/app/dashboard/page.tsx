@@ -75,6 +75,8 @@ export default function DashboardPage() {
     setUser({ ...user, activeRole: role })
   }
 
+  const selectedRole = user?.roles?.length ? (user.activeRole ?? user.roles[0]) : undefined
+
   return (
     <div className="min-h-screen">
       <header className="bg-[#003366] text-white shadow-lg">
@@ -102,7 +104,7 @@ export default function DashboardPage() {
             <div className="flex items-center gap-2">
               <label className="text-xs text-slate-600">Active role</label>
               <select
-                value={user.activeRole ?? user.roles[0] ?? ''}
+                value={selectedRole}
                 onChange={event => onRoleChange(event.target.value as AppRole)}
                 className="border border-slate-300 rounded-md px-2 py-1 text-xs"
               >

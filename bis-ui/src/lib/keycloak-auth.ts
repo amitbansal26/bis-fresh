@@ -49,6 +49,11 @@ function getRedirectUri() {
   return `${window.location.origin}/login`
 }
 
+function addBase64Padding(value: string) {
+  const paddingLength = (4 - (value.length % 4)) % 4
+  return `${value}${'='.repeat(paddingLength)}`
+}
+
 function toBase64Url(input: ArrayBuffer | Uint8Array | string) {
   let inputBytes: Uint8Array
   if (typeof input === 'string') {
@@ -177,7 +182,7 @@ function decodeTokenPayload(token: string): Record<string, unknown> | null {
 
   try {
     const normalized = parts[1].replace(/-/g, '+').replace(/_/g, '/')
-    const withPadding = `${normalized}${'='.repeat((4 - (normalized.length % 4)) % 4)}`
+    const withPadding = addBase64Padding(normalized)
     const payloadJson = atob(withPadding)
     return JSON.parse(payloadJson) as Record<string, unknown>
   } catch {
