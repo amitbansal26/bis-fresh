@@ -23,6 +23,15 @@ Based on the requirements in this README and the referenced RFP PDF, this reposi
 mvn clean test
 ```
 
+Start the local LGTM observability stack (Grafana + Loki + Tempo + Mimir):
+
+```bash
+docker compose up -d lgtm
+```
+
+- Grafana: `http://localhost:3000` (default login: `admin` / `admin`)
+- OTLP endpoints: `localhost:4317` (gRPC), `localhost:4318` (HTTP)
+
 Run any service module:
 
 ```bash
