@@ -1,17 +1,25 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
+import { authFetch } from '@/lib/keycloak-auth'
 
 export default function LaboratoryPage() {
   const [labCode, setLabCode] = useState('LAB001')
   const [samples, setSamples] = useState<{id: number; sampleNo: string; productName: string; status: string; receivedAt: string}[]>([])
   const [loading, setLoading] = useState(false)
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : ''
-  const headers = { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }
 
-  const loadSamples = () => {
+  const loadSamples = async () => {
     setLoading(true)
-    fetch(`/api/labs/${labCode}/samples`, { headers }).then(r => r.json()).then(setSamples).catch(() => setSamples([])).finally(() => setLoading(false))
+    try {
+      const response = await authFetch(`/api/labs/${labCode}/samples`)
+      if (!response.ok) throw new Error('Failed to load samples')
+      const payload = (await response.json()) as {id: number; sampleNo: string; productName: string; status: string; receivedAt: string}[]
+      setSamples(payload)
+    } catch {
+      setSamples([])
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (

@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { authFetch } from '@/lib/keycloak-auth'
 
 interface Application {
   id: string
@@ -19,17 +20,35 @@ export default function CertificationPage() {
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({ schemeCode: 'SCHEME_I', applicantName: '', companyName: '', productName: '', productCategory: '', standardNo: '', factoryAddress: '', factoryState: '', factoryPinCode: '' })
 
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : ''
-  const headers = { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }
-
   useEffect(() => {
-    fetch('/api/certifications', { headers }).then(r => r.json()).then(setApplications).catch(() => setApplications([])).finally(() => setLoading(false))
+    const loadApplications = async () => {
+      try {
+        const response = await authFetch('/api/certifications')
+        if (!response.ok) throw new Error('Failed to load applications')
+        const payload = (await response.json()) as Application[]
+        setApplications(payload)
+      } catch {
+        setApplications([])
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadApplications()
   }, [])
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const res = await fetch('/api/certifications', { method: 'POST', headers, body: JSON.stringify(form) })
-    if (res.ok) { const newApp = await res.json(); setApplications(prev => [newApp, ...prev]); setShowForm(false) }
+    const res = await authFetch('/api/certifications', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(form),
+    })
+    if (res.ok) {
+      const newApp = (await res.json()) as Application
+      setApplications(prev => [newApp, ...prev])
+      setShowForm(false)
+    }
   }
 
   const statusColor = (s: string) => ({ APPROVED: 'text-green-600 bg-green-50', REJECTED: 'text-red-600 bg-red-50', SUBMITTED: 'text-yellow-600 bg-yellow-50' }[s] || 'text-gray-600 bg-gray-50')

@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
@@ -79,11 +79,17 @@ public class UserController {
 
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<UserDto> getCurrentUser(@AuthenticationPrincipal UserDetails principal) {
+    public ResponseEntity<UserDto> getCurrentUser(@AuthenticationPrincipal Jwt principal) {
         if (principal == null) {
             return ResponseEntity.status(401).build();
         }
-        return userRepository.findByUsername(principal.getUsername())
+
+        String username = principal.getClaimAsString("preferred_username");
+        if (username == null || username.isBlank()) {
+            username = principal.getSubject();
+        }
+
+        return userRepository.findByUsername(username)
                 .map(this::toDto)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

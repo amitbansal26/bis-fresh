@@ -11,12 +11,14 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/bis}
+
 server:
   port: 8081
-app:
-  jwt:
-    secret: bXlTZWNyZXRLZXlGb3JCSVNNYW5ha29ubGluZVBsYXRmb3JtMjAyNQ==
-    expiry-hours: 24
 management:
   endpoints:
     web:

@@ -1,15 +1,35 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { authFetch, getCurrentUsername, logout } from '@/lib/keycloak-auth'
+
+type DashboardUser = { username: string; roles: string[] }
 
 export default function DashboardPage() {
-  const [user, setUser] = useState<{username: string; roles: string[]} | null>(null)
+  const [user, setUser] = useState<DashboardUser | null>(null)
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (!token) { window.location.href = '/login'; return }
-    fetch('/api/identity/users/me', { headers: { Authorization: `Bearer ${token}` } })
-      .then(r => r.json()).then(setUser).catch(() => window.location.href = '/login')
+    const loadUser = async () => {
+      try {
+        const res = await authFetch('/api/identity/users/me')
+        if (res.ok) {
+          const payload = (await res.json()) as { username: string; roles: string[] }
+          setUser({ username: payload.username, roles: payload.roles ?? [] })
+          return
+        }
+      } catch {
+        // fallback below
+      }
+
+      const username = await getCurrentUsername()
+      if (username) {
+        setUser({ username, roles: [] })
+      } else {
+        window.location.href = '/login'
+      }
+    }
+
+    loadUser()
   }, [])
 
   const stats = [
@@ -26,7 +46,7 @@ export default function DashboardPage() {
           <h1 className="text-xl font-bold">BIS Manakonline - Officer Dashboard</h1>
           <div className="flex items-center gap-4">
             <span className="text-blue-200">{user?.username}</span>
-            <button onClick={() => { localStorage.removeItem('token'); window.location.href = '/' }}
+            <button onClick={logout}
               className="text-sm bg-red-600 hover:bg-red-700 px-3 py-1 rounded">Logout</button>
           </div>
         </div>
