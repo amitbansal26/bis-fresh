@@ -3,6 +3,8 @@ spring:
     name: bis-master-data-service
   datasource:
     url: jdbc:postgresql://localhost:5432/bisdb
+    username: bisuser
+    password: bispassword
   jpa:
     hibernate:
       ddl-auto: validate
