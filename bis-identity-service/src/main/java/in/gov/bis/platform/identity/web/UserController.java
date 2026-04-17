@@ -42,17 +42,17 @@ public class UserController {
 
     @PutMapping("/{id}/roles")
     public ResponseEntity<UserDto> assignRoles(@PathVariable UUID id,
-                                               @RequestBody List<String> roleNames) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + id));
-
-        Set<Role> roles = new HashSet<>();
-        for (String name : roleNames) {
-            roleRepository.findByName(name).ifPresent(roles::add);
-        }
-        user.setRoles(roles);
-        userRepository.save(user);
-        return ResponseEntity.ok(toDto(user));
+                                               @RequestBody @jakarta.validation.constraints.NotNull List<String> roleNames) {
+        return userRepository.findById(id)
+                .map(user -> {
+                    Set<Role> roles = new HashSet<>();
+                    for (String name : roleNames) {
+                        roleRepository.findByName(name).ifPresent(roles::add);
+                    }
+                    user.setRoles(roles);
+                    return ResponseEntity.ok(toDto(userRepository.save(user)));
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
     private UserDto toDto(User user) {

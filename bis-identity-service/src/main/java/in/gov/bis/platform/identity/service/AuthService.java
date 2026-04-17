@@ -30,10 +30,10 @@ public class AuthService {
 
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.username())) {
-            throw new IllegalArgumentException("Username already taken: " + request.username());
+            throw new IllegalArgumentException("Registration failed");
         }
         if (userRepository.existsByEmail(request.email())) {
-            throw new IllegalArgumentException("Email already registered: " + request.email());
+            throw new IllegalArgumentException("Registration failed");
         }
 
         User user = User.builder()
