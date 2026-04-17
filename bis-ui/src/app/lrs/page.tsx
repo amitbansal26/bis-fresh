@@ -15,6 +15,7 @@ export default function LrsPage() {
           ))}
         </div>
       </main>
-    </div>    </ModuleGuard>
+    </div>
+    </ModuleGuard>
   )
 }

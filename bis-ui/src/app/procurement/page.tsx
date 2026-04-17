@@ -15,6 +15,7 @@ export default function ProcurementPage() {
           ))}
         </div>
       </main>
-    </div>    </ModuleGuard>
+    </div>
+    </ModuleGuard>
   )
 }

@@ -15,6 +15,7 @@ export default function NotificationsPage() {
           ))}
         </div>
       </main>
-    </div>    </ModuleGuard>
+    </div>
+    </ModuleGuard>
   )
 }

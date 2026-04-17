@@ -15,6 +15,7 @@ export default function IntegrationPage() {
           ))}
         </div>
       </main>
-    </div>    </ModuleGuard>
+    </div>
+    </ModuleGuard>
   )
 }

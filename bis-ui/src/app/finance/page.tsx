@@ -15,6 +15,7 @@ export default function FinancePage() {
           ))}
         </div>
       </main>
-    </div>    </ModuleGuard>
+    </div>
+    </ModuleGuard>
   )
 }

@@ -15,6 +15,7 @@ export default function FacilitiesPage() {
           ))}
         </div>
       </main>
-    </div>    </ModuleGuard>
+    </div>
+    </ModuleGuard>
   )
 }
