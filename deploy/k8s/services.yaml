@@ -1,0 +1,359 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bis-identity-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bis-identity-service
+  template:
+    metadata:
+      labels:
+        app: bis-identity-service
+    spec:
+      containers:
+        - name: bis-identity-service
+          image: bis-identity-service:INVALID_TAG
+          ports:
+            - containerPort: 8081
+              name: http
+          envFrom:
+            - configMapRef:
+                name: bis-platform-config
+          env:
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: bis-platform-secrets
+                  key: SPRING_DATASOURCE_USERNAME
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bis-platform-secrets
+                  key: SPRING_DATASOURCE_PASSWORD
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bis-identity-service
+spec:
+  selector:
+    app: bis-identity-service
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8081
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bis-certification-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bis-certification-service
+  template:
+    metadata:
+      labels:
+        app: bis-certification-service
+    spec:
+      containers:
+        - name: bis-certification-service
+          image: bis-certification-service:INVALID_TAG
+          ports:
+            - containerPort: 8082
+              name: http
+          envFrom:
+            - configMapRef:
+                name: bis-platform-config
+          env:
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: bis-platform-secrets
+                  key: SPRING_DATASOURCE_USERNAME
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bis-platform-secrets
+                  key: SPRING_DATASOURCE_PASSWORD
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bis-certification-service
+spec:
+  selector:
+    app: bis-certification-service
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8082
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bis-laboratory-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bis-laboratory-service
+  template:
+    metadata:
+      labels:
+        app: bis-laboratory-service
+    spec:
+      containers:
+        - name: bis-laboratory-service
+          image: bis-laboratory-service:INVALID_TAG
+          ports:
+            - containerPort: 8083
+              name: http
+          envFrom:
+            - configMapRef:
+                name: bis-platform-config
+          env:
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: bis-platform-secrets
+                  key: SPRING_DATASOURCE_USERNAME
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bis-platform-secrets
+                  key: SPRING_DATASOURCE_PASSWORD
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bis-laboratory-service
+spec:
+  selector:
+    app: bis-laboratory-service
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8083
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bis-operations-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bis-operations-service
+  template:
+    metadata:
+      labels:
+        app: bis-operations-service
+    spec:
+      containers:
+        - name: bis-operations-service
+          image: bis-operations-service:INVALID_TAG
+          ports:
+            - containerPort: 8084
+              name: http
+          envFrom:
+            - configMapRef:
+                name: bis-platform-config
+          env:
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: bis-platform-secrets
+                  key: SPRING_DATASOURCE_USERNAME
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bis-platform-secrets
+                  key: SPRING_DATASOURCE_PASSWORD
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bis-operations-service
+spec:
+  selector:
+    app: bis-operations-service
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8084
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bis-integration-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bis-integration-service
+  template:
+    metadata:
+      labels:
+        app: bis-integration-service
+    spec:
+      containers:
+        - name: bis-integration-service
+          image: bis-integration-service:INVALID_TAG
+          ports:
+            - containerPort: 8085
+              name: http
+          envFrom:
+            - configMapRef:
+                name: bis-platform-config
+          env:
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: bis-platform-secrets
+                  key: SPRING_DATASOURCE_USERNAME
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bis-platform-secrets
+                  key: SPRING_DATASOURCE_PASSWORD
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bis-integration-service
+spec:
+  selector:
+    app: bis-integration-service
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8085
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bis-master-data-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bis-master-data-service
+  template:
+    metadata:
+      labels:
+        app: bis-master-data-service
+    spec:
+      containers:
+        - name: bis-master-data-service
+          image: bis-master-data-service:INVALID_TAG
+          ports:
+            - containerPort: 8086
+              name: http
+          envFrom:
+            - configMapRef:
+                name: bis-platform-config
+          env:
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: bis-platform-secrets
+                  key: SPRING_DATASOURCE_USERNAME
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bis-platform-secrets
+                  key: SPRING_DATASOURCE_PASSWORD
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bis-master-data-service
+spec:
+  selector:
+    app: bis-master-data-service
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8086
+      targetPort: http
