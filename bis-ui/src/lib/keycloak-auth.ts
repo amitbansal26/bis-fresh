@@ -39,17 +39,17 @@ function getRedirectUri() {
 }
 
 function toBase64Url(input: ArrayBuffer | Uint8Array | string) {
-  let bytes: Uint8Array
+  let inputBytes: Uint8Array
   if (typeof input === 'string') {
-    bytes = new TextEncoder().encode(input)
+    inputBytes = new TextEncoder().encode(input)
   } else if (input instanceof ArrayBuffer) {
-    bytes = new Uint8Array(input)
+    inputBytes = new Uint8Array(input)
   } else {
-    bytes = input
+    inputBytes = input
   }
 
   let binary = ''
-  bytes.forEach(b => {
+  inputBytes.forEach(b => {
     binary += String.fromCharCode(b)
   })
   return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '')
