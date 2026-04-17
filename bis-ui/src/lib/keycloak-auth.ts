@@ -176,7 +176,9 @@ function decodeTokenPayload(token: string): Record<string, unknown> | null {
   }
 
   try {
-    const payloadJson = atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'))
+    const normalized = parts[1].replace(/-/g, '+').replace(/_/g, '/')
+    const withPadding = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '=')
+    const payloadJson = atob(withPadding)
     return JSON.parse(payloadJson) as Record<string, unknown>
   } catch {
     return null
@@ -264,7 +266,7 @@ export function isAuthBypassEnabled() {
 export function startBypassSession(username: string, roles: string[]) {
   const normalizedRoles = normalizeRoles(roles)
   if (!AUTH_BYPASS_ENABLED) {
-    throw new Error('Keycloak bypass is not enabled')
+    throw new Error('Cannot start bypass session: NEXT_PUBLIC_AUTH_BYPASS environment variable is not set to true')
   }
 
   if (!username.trim() || normalizedRoles.length === 0) {
@@ -315,7 +317,7 @@ export function clearAuthSession() {
 
 export async function beginKeycloakLogin() {
   if (AUTH_BYPASS_ENABLED) {
-    throw new Error('Keycloak login is bypassed in this environment')
+    throw new Error('Keycloak login is disabled when NEXT_PUBLIC_AUTH_BYPASS is enabled')
   }
 
   const state = randomString(32)

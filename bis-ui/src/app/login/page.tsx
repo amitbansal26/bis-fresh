@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { AppRole, RFP_ROLES, getRoleLabel } from '@/lib/authz'
 import { beginKeycloakLogin, handleAuthCallback, isAuthBypassEnabled, startBypassSession } from '@/lib/keycloak-auth'
 
 export default function LoginPage() {
+  const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [username, setUsername] = useState('test.user')
@@ -22,7 +24,7 @@ export default function LoginPage() {
         setLoading(true)
         const completed = await handleAuthCallback()
         if (completed) {
-          window.location.href = '/dashboard'
+          router.push('/dashboard')
         }
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : 'Login failed')
@@ -32,7 +34,7 @@ export default function LoginPage() {
     }
 
     runCallback()
-  }, [bypassEnabled])
+  }, [bypassEnabled, router])
 
   const toggleRole = (role: AppRole) => {
     setSelectedRoles(prev => (prev.includes(role) ? prev.filter(item => item !== role) : [...prev, role]))
@@ -43,7 +45,7 @@ export default function LoginPage() {
     setLoading(true)
     try {
       startBypassSession(username, selectedRoles)
-      window.location.href = '/dashboard'
+      router.push('/dashboard')
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Unable to start bypass login')
       setLoading(false)

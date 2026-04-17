@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { AppModule, AppRole, getRoleLabel } from '@/lib/authz'
 import { authFetch, getCurrentUser, logout, setActiveRole } from '@/lib/keycloak-auth'
 import { canAccessModule } from '@/lib/authz'
@@ -8,6 +9,7 @@ import { canAccessModule } from '@/lib/authz'
 type DashboardUser = { username: string; roles: AppRole[]; activeRole: AppRole | null }
 
 export default function DashboardPage() {
+  const router = useRouter()
   const [user, setUser] = useState<DashboardUser | null>(null)
 
   useEffect(() => {
@@ -32,12 +34,12 @@ export default function DashboardPage() {
       if (currentUser) {
         setUser(currentUser)
       } else {
-        window.location.href = '/login'
+        router.push('/login')
       }
     }
 
     loadUser()
-  }, [])
+  }, [router])
 
   const stats = [
     { label: 'Pending Applications', value: '142', color: 'text-yellow-600', bg: 'bg-yellow-50' },

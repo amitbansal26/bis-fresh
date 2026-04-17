@@ -2,11 +2,13 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { AppModule } from '@/lib/authz'
 import { getCurrentUser } from '@/lib/keycloak-auth'
 import { canAccessModule } from '@/lib/authz'
 
 export function ModuleGuard({ module, children }: { module: AppModule; children: React.ReactNode }) {
+  const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [authorized, setAuthorized] = useState(false)
 
@@ -20,7 +22,7 @@ export function ModuleGuard({ module, children }: { module: AppModule; children:
       }
 
       if (!user) {
-        window.location.href = '/login'
+        router.push('/login')
         return
       }
 
@@ -33,7 +35,7 @@ export function ModuleGuard({ module, children }: { module: AppModule; children:
     return () => {
       cancelled = true
     }
-  }, [module])
+  }, [module, router])
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center text-slate-500">Loading...</div>
