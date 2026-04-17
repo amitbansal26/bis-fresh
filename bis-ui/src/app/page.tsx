@@ -56,7 +56,13 @@ export default function Home() {
             <Link key={mod.href} href={mod.href} className="group surface-card overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
               <div className={`${mod.color} p-4 text-white`}>
                 <span className="inline-flex h-8 w-8 rounded-full border border-white/40 bg-white/20 text-sm font-semibold items-center justify-center">
-                  {mod.title.split(' ').map(word => word[0]).join('').slice(0, 2)}
+                  {(() => {
+                    const words = mod.title.split(' ').filter(Boolean)
+                    const initials = words.length > 1
+                      ? words.map(word => word[0]).join('').slice(0, 2)
+                      : mod.title.replace(/\s+/g, '').slice(0, 2)
+                    return initials.toUpperCase()
+                  })()}
                 </span>
               </div>
               <div className="p-4">

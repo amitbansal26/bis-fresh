@@ -60,7 +60,7 @@ export default function LoginPage() {
             {loading ? 'Signing in...' : 'Sign In with Keycloak'}
           </button>
           <div className="mt-4 text-center">
-            <Link href="/" className="text-sm text-[#003366] hover:underline underline-offset-2">← Back to Home</Link>
+            <Link href="/" className="text-sm text-[#003366] hover:underline focus:underline underline-offset-2">← Back to Home</Link>
           </div>
         </div>
       </div>
