@@ -15,6 +15,7 @@ Based on the requirements in this README and the referenced RFP PDF, this reposi
 | `bis-laboratory-service` | Spring Boot service | LIMS and LRS service foundations |
 | `bis-operations-service` | Spring Boot service | HR, finance, procurement and inventory foundations |
 | `bis-integration-service` | Spring Boot service | Integration, notification, and cross-platform interoperability foundations |
+| `bis-master-data-service` | Spring Boot service | Master data management for shared reference data (port 8086) |
 
 ### Quick start
 
