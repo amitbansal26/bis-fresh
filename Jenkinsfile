@@ -78,7 +78,7 @@ pipeline {
             set -euxo pipefail
 
             git config user.name "jenkins-bot"
-            git config user.email "jenkins-bot@local"
+            git config user.email "jenkins-bot@noreply.local"
 
             awk -v tag="${IMAGE_TAG}" '
               /^images:/ {in_images=1}

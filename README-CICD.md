@@ -86,4 +86,5 @@ argocd app get bis-platform
 ## Notes
 
 - This setup deploys backend services only (`bis-*service` modules in the Maven reactor).
+- Base Deployment manifests intentionally use `INVALID_TAG`; Kustomize image overrides must supply real tags.
 - Database, Keycloak, and Kafka endpoints are configured via ConfigMap/Secret and should be adjusted for your environment.
