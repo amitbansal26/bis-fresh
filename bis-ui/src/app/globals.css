@@ -5,8 +5,58 @@
 :root {
   --bis-blue: #003366;
   --bis-orange: #FF6600;
+  --bis-navy: #0b2948;
+  --bis-surface: #ffffff;
+  --bis-page: #f3f6fb;
 }
 
 body {
-  font-family: 'Segoe UI', sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: radial-gradient(circle at top, #f9fbff 0%, var(--bis-page) 45%, #eef3f9 100%);
+  color: #1e293b;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.surface-card {
+  background: var(--bis-surface);
+  border: 1px solid #e2e8f0;
+  border-radius: 0.9rem;
+  box-shadow: 0 10px 24px -18px rgba(15, 23, 42, 0.35);
+}
+
+.primary-button {
+  background: linear-gradient(135deg, var(--bis-blue), var(--bis-navy));
+  color: #fff;
+  transition: all 180ms ease;
+}
+
+.primary-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px -12px rgba(11, 41, 72, 0.7);
+}
+
+.primary-button:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 3px rgba(191, 219, 254, 0.9), 0 10px 20px -12px rgba(11, 41, 72, 0.7);
+  outline: none;
+}
+
+.secondary-button {
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #0f172a;
+  transition: all 180ms ease;
+}
+
+.secondary-button:hover {
+  border-color: #94a3b8;
+  background: #f8fafc;
+}
+
+.secondary-button:focus-visible {
+  border-color: #94a3b8;
+  background: #f8fafc;
+  box-shadow: 0 0 0 3px rgba(191, 219, 254, 0.9);
+  outline: none;
 }

@@ -40,24 +40,24 @@ export default function DashboardPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-[#003366] text-white shadow">
+    <div className="min-h-screen">
+      <header className="bg-[#003366] text-white shadow-lg">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-xl font-bold">BIS Manakonline - Officer Dashboard</h1>
           <div className="flex items-center gap-4">
-            <span className="text-blue-200">{user?.username}</span>
+            <span className="text-blue-100/90 text-sm">{user?.username}</span>
             <button onClick={logout}
-              className="text-sm bg-red-600 hover:bg-red-700 px-3 py-1 rounded">Logout</button>
+              className="text-sm bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-md font-medium transition-colors">Logout</button>
           </div>
         </div>
       </header>
       <main className="max-w-7xl mx-auto px-4 py-8">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Welcome back, {user?.username || '...'}</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <h2 className="text-2xl font-bold text-slate-800 mb-6">Welcome back, {user?.username || '...'}</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {stats.map(s => (
-            <div key={s.label} className={`${s.bg} rounded-xl p-6 shadow-sm`}>
+            <div key={s.label} className={`${s.bg} surface-card p-6`}>
               <div className={`text-4xl font-bold ${s.color}`}>{s.value}</div>
-              <div className="text-gray-600 mt-2 text-sm font-medium">{s.label}</div>
+              <div className="text-slate-600 mt-2 text-sm font-medium">{s.label}</div>
             </div>
           ))}
         </div>
@@ -70,9 +70,9 @@ export default function DashboardPage() {
             { title: 'Procurement', href: '/procurement', desc: 'Purchase orders and stock' },
             { title: 'Legal', href: '/legal', desc: 'Cases and complaints' },
           ].map(m => (
-            <Link key={m.href} href={m.href} className="bg-white rounded-xl shadow hover:shadow-md transition p-6 border border-gray-100">
+            <Link key={m.href} href={m.href} className="surface-card hover:shadow-md transition p-6">
               <h3 className="font-bold text-[#003366] text-lg">{m.title}</h3>
-              <p className="text-gray-500 text-sm mt-1">{m.desc}</p>
+              <p className="text-slate-500 text-sm mt-1">{m.desc}</p>
             </Link>
           ))}
         </div>
