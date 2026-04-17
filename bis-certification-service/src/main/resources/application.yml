@@ -1,8 +1,19 @@
 spring:
   application:
     name: bis-certification-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bisdb
+    username: bisuser
+    password: bispassword
+  jpa:
+    hibernate:
+      ddl-auto: validate
 server:
   port: 8082
+app:
+  jwt:
+    secret: bXlTZWNyZXRLZXlGb3JCSVNNYW5ha29ubGluZVBsYXRmb3JtMjAyNQ==
+    expiry-hours: 24
 management:
   endpoints:
     web:
