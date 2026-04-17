@@ -102,7 +102,7 @@ export default function DashboardPage() {
             <div className="flex items-center gap-2">
               <label className="text-xs text-slate-600">Active role</label>
               <select
-                value={user.activeRole ?? user.roles[0]}
+                value={user.activeRole ?? user.roles[0] ?? ''}
                 onChange={event => onRoleChange(event.target.value as AppRole)}
                 className="border border-slate-300 rounded-md px-2 py-1 text-xs"
               >

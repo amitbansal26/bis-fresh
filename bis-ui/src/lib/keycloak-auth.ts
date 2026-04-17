@@ -177,7 +177,7 @@ function decodeTokenPayload(token: string): Record<string, unknown> | null {
 
   try {
     const normalized = parts[1].replace(/-/g, '+').replace(/_/g, '/')
-    const withPadding = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '=')
+    const withPadding = `${normalized}${'='.repeat((4 - (normalized.length % 4)) % 4)}`
     const payloadJson = atob(withPadding)
     return JSON.parse(payloadJson) as Record<string, unknown>
   } catch {
@@ -285,8 +285,8 @@ export function getActiveRole(): AppRole | null {
     return null
   }
 
-  const [role] = normalizeRoles([roleRaw])
-  return role ?? null
+  const normalizedRoles = normalizeRoles([roleRaw])
+  return normalizedRoles.length > 0 ? normalizedRoles[0] : null
 }
 
 export function setActiveRole(role: AppRole) {
