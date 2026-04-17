@@ -1,13 +1,16 @@
 pipeline {
   agent any
 
+  parameters {
+    string(name: 'DOCKER_REGISTRY', defaultValue: '', description: 'Required image registry prefix, e.g. ghcr.io/my-org')
+  }
+
   options {
     timestamps()
     disableConcurrentBuilds()
   }
 
   environment {
-    DOCKER_REGISTRY = 'ghcr.io/YOUR_ORG'
     IMAGE_TAG = "${BUILD_NUMBER}"
     GITOPS_FILE = 'deploy/k8s/kustomization.yaml'
     SERVICES = 'bis-identity-service bis-certification-service bis-laboratory-service bis-operations-service bis-integration-service bis-master-data-service'
@@ -23,6 +26,17 @@ pipeline {
     stage('Unit Tests') {
       steps {
         sh 'mvn -B clean test'
+      }
+    }
+
+    stage('Validate Pipeline Configuration') {
+      steps {
+        sh '''#!/bin/bash
+          set -euxo pipefail
+          [ -n "${DOCKER_REGISTRY}" ] || (echo "DOCKER_REGISTRY parameter is required" && exit 1)
+          ! grep -q "YOUR_ORG" deploy/k8s/kustomization.yaml || (echo "Replace YOUR_ORG in deploy/k8s/kustomization.yaml" && exit 1)
+          ! grep -q "__REPLACE_" deploy/k8s/secret.yaml || (echo "Replace placeholder secrets before deployment" && exit 1)
+        '''
       }
     }
 

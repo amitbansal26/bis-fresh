@@ -29,13 +29,13 @@ This repository now includes a GitOps-style CI/CD flow:
 
 Before using the pipeline, update these placeholders:
 
-- In `Jenkinsfile`: `DOCKER_REGISTRY = 'ghcr.io/YOUR_ORG'`
+- In Jenkins build parameters: set `DOCKER_REGISTRY` (example `ghcr.io/my-org`)
 - In `deploy/k8s/kustomization.yaml`: all `newName: ghcr.io/YOUR_ORG/...`
 - In `deploy/argocd/bis-platform-application.yaml`:
   - `repoURL`
   - `targetRevision` (branch used for GitOps)
 
-Also replace default credentials in `deploy/k8s/secret.yaml`.
+Also replace placeholder credentials in `deploy/k8s/secret.yaml`.
 For production, replace this Secret with a secure solution (for example Sealed Secrets, External Secrets Operator, or Vault integration).
 
 ## Jenkins credentials required
@@ -69,6 +69,7 @@ ArgoCD will watch `deploy/k8s` and sync resources into namespace `bis-platform`.
 - Push a commit to the tracked branch.
 - Jenkins pipeline will:
   - Run `mvn clean test`
+  - Validate that required placeholders are replaced (`DOCKER_REGISTRY`, `YOUR_ORG`, secret placeholders)
   - Build/push images for all backend services
   - Update all `newTag` values in `deploy/k8s/kustomization.yaml` to `${BUILD_NUMBER}`
   - Push the updated manifest commit
