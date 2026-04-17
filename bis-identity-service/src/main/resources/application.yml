@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: bis-identity-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bisdb
+    username: bisuser
+    password: bispassword
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+server:
+  port: 8081
+app:
+  jwt:
+    secret: bXlTZWNyZXRLZXlGb3JCSVNNYW5ha29ubGluZVBsYXRmb3JtMjAyNQ==
+    expiry-hours: 24
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
