@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: bis-master-data-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bisdb
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+server:
+  port: 8086
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
