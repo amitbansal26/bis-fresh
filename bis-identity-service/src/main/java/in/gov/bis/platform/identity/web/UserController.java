@@ -8,6 +8,8 @@ import in.gov.bis.platform.identity.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
@@ -52,6 +54,38 @@ public class UserController {
                     user.setRoles(roles);
                     return ResponseEntity.ok(toDto(userRepository.save(user)));
                 })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{userId}/enable")
+    public ResponseEntity<UserDto> enableUser(@PathVariable UUID userId) {
+        return userRepository.findById(userId)
+                .map(user -> {
+                    user.setEnabled(true);
+                    return ResponseEntity.ok(toDto(userRepository.save(user)));
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{userId}/disable")
+    public ResponseEntity<UserDto> disableUser(@PathVariable UUID userId) {
+        return userRepository.findById(userId)
+                .map(user -> {
+                    user.setEnabled(false);
+                    return ResponseEntity.ok(toDto(userRepository.save(user)));
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<UserDto> getCurrentUser(@AuthenticationPrincipal UserDetails principal) {
+        if (principal == null) {
+            return ResponseEntity.status(401).build();
+        }
+        return userRepository.findByUsername(principal.getUsername())
+                .map(this::toDto)
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
