@@ -12,7 +12,8 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
   flyway:
     enabled: false
-app:
-  jwt:
-    secret: bXlTZWNyZXRLZXlGb3JCSVNNYW5ha29ubGluZVBsYXRmb3JtMjAyNQ==
-    expiry-hours: 24
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost/mock-jwks

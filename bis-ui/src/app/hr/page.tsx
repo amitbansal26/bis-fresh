@@ -1,17 +1,29 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { authFetch } from '@/lib/keycloak-auth'
 
 interface Employee { id: number; employeeNo: string; name: string; designation: string; department: string; officeCode: string; status: string }
 
 export default function HRPage() {
   const [employees, setEmployees] = useState<Employee[]>([])
   const [loading, setLoading] = useState(true)
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : ''
-  const headers = { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }
 
   useEffect(() => {
-    fetch('/api/hr/employees', { headers }).then(r => r.json()).then(setEmployees).catch(() => setEmployees([])).finally(() => setLoading(false))
+    const loadEmployees = async () => {
+      try {
+        const response = await authFetch('/api/hr/employees')
+        if (!response.ok) throw new Error('Failed to load employees')
+        const payload = (await response.json()) as Employee[]
+        setEmployees(payload)
+      } catch {
+        setEmployees([])
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadEmployees()
   }, [])
 
   return (

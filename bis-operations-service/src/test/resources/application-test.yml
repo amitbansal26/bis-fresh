@@ -16,7 +16,7 @@ spring:
     user:
       name: testuser
       password: testpass
-app:
-  jwt:
-    secret: bXlTZWNyZXRLZXlGb3JCSVNNYW5ha29ubGluZVBsYXRmb3JtMjAyNQ==
-    expiry-hours: 24
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost/mock-jwks

@@ -34,6 +34,26 @@ Each service exposes:
 - `GET /api/module-info` for module/RFP mapping metadata
 - Actuator health endpoint at `/actuator/health`
 
+### OAuth2 / Keycloak configuration
+
+All secured services now validate OAuth2 access tokens from Keycloak and enforce DPoP proofs on protected APIs.
+
+Set the Keycloak issuer for services:
+
+```bash
+export KEYCLOAK_ISSUER_URI=http://localhost:8080/realms/bis
+```
+
+Set the UI Keycloak settings:
+
+```bash
+export NEXT_PUBLIC_KEYCLOAK_URL=http://localhost:8080
+export NEXT_PUBLIC_KEYCLOAK_REALM=bis
+export NEXT_PUBLIC_KEYCLOAK_CLIENT_ID=bis-ui
+```
+
+The UI login now uses OAuth2 Authorization Code + PKCE with DPoP and sends `Authorization: DPoP <access_token>` plus the `DPoP` proof header on API calls.
+
 ## 1. Document purpose
 
 This markdown document consolidates the implementation-oriented requirements from the BIS Manakonline RFP into an engineering plan that is easier to execute.
