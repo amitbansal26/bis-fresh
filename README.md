@@ -1,5 +1,38 @@
 # BIS Manakonline RFP – Requirements Analysis and 100-Phase Implementation Roadmap
 
+## Implemented multi-module Spring Boot project (codebase)
+
+Based on the requirements in this README and the referenced RFP PDF, this repository now includes a Maven multi-module Spring Boot starter aligned to major BIS domain clusters.
+
+### Project modules
+
+| Module | Type | Purpose |
+| --- | --- | --- |
+| `bis-platform-common` | Shared library | Common domain contracts used across services |
+| `bis-platform-events` | Shared library | Common event envelope for Kafka/event-driven integrations |
+| `bis-identity-service` | Spring Boot service | User registration, bureau user administration, access foundations (RFP 6.2/6.3) |
+| `bis-certification-service` | Spring Boot service | Product certification and scheme operations foundations |
+| `bis-laboratory-service` | Spring Boot service | LIMS and LRS service foundations |
+| `bis-operations-service` | Spring Boot service | HR, finance, procurement and inventory foundations |
+| `bis-integration-service` | Spring Boot service | Integration, notification, and cross-platform interoperability foundations |
+
+### Quick start
+
+```bash
+mvn clean test
+```
+
+Run any service module:
+
+```bash
+mvn -pl bis-identity-service spring-boot:run
+```
+
+Each service exposes:
+
+- `GET /api/module-info` for module/RFP mapping metadata
+- Actuator health endpoint at `/actuator/health`
+
 ## 1. Document purpose
 
 This markdown document consolidates the implementation-oriented requirements from the BIS Manakonline RFP into an engineering plan that is easier to execute.

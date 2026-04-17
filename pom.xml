@@ -1,0 +1,32 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.11</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>in.gov.bis</groupId>
+    <artifactId>bis-fresh-platform</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>bis-fresh-platform</name>
+    <description>BIS Manakonline multi-module Spring Boot platform starter</description>
+
+    <modules>
+        <module>bis-platform-common</module>
+        <module>bis-platform-events</module>
+        <module>bis-identity-service</module>
+        <module>bis-certification-service</module>
+        <module>bis-laboratory-service</module>
+        <module>bis-operations-service</module>
+        <module>bis-integration-service</module>
+    </modules>
+
+    <properties>
+        <java.version>17</java.version>
+    </properties>
+</project>
