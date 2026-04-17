@@ -59,9 +59,18 @@ Set the UI Keycloak settings:
 export NEXT_PUBLIC_KEYCLOAK_URL=http://localhost:8080
 export NEXT_PUBLIC_KEYCLOAK_REALM=bis
 export NEXT_PUBLIC_KEYCLOAK_CLIENT_ID=bis-ui
+export NEXT_PUBLIC_AUTH_BYPASS=false
 ```
 
 The UI login now uses OAuth2 Authorization Code + PKCE with DPoP and sends `Authorization: DPoP <access_token>` plus the `DPoP` proof header on API calls.
+
+For local testing without Keycloak, set:
+
+```bash
+export NEXT_PUBLIC_AUTH_BYPASS=true
+```
+
+When bypass mode is enabled, `/login` allows selecting one or more RFP roles and signs in with a local session-only mock identity.
 
 ## 1. Document purpose
 

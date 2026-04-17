@@ -1,7 +1,9 @@
 'use client'
 import Link from 'next/link'
+import { ModuleGuard } from '@/lib/module-guard'
 export default function ProcurementPage() {
   return (
+    <ModuleGuard module="procurement">
     <div className="min-h-screen bg-gray-50">
       <header className="bg-[#003366] text-white px-4 py-4">
         <div className="max-w-7xl mx-auto flex justify-between"><h1 className="text-xl font-bold">Procurement & Inventory</h1><Link href="/dashboard" className="text-blue-200 text-sm">← Dashboard</Link></div>
@@ -13,6 +15,6 @@ export default function ProcurementPage() {
           ))}
         </div>
       </main>
-    </div>
+    </div>    </ModuleGuard>
   )
 }

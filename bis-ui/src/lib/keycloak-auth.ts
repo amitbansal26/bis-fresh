@@ -1,10 +1,17 @@
 'use client'
 
+import { AppModule, AppRole, canAccessModule, normalizeRoles } from '@/lib/authz'
+
 type TokenResponse = {
   access_token: string
   refresh_token?: string
   id_token?: string
   expires_in: number
+}
+
+type AuthUser = {
+  username: string
+  roles: AppRole[]
 }
 
 const STORAGE_KEYS = {
@@ -16,11 +23,15 @@ const STORAGE_KEYS = {
   state: 'oauth_state',
   dpopPrivateJwk: 'oauth_dpop_private_jwk',
   dpopPublicJwk: 'oauth_dpop_public_jwk',
+  bypassUsername: 'oauth_bypass_username',
+  bypassRoles: 'oauth_bypass_roles',
+  activeRole: 'oauth_active_role',
 } as const
 
 const KEYCLOAK_URL = process.env.NEXT_PUBLIC_KEYCLOAK_URL ?? 'http://localhost:8080'
 const KEYCLOAK_REALM = process.env.NEXT_PUBLIC_KEYCLOAK_REALM ?? 'bis'
 const KEYCLOAK_CLIENT_ID = process.env.NEXT_PUBLIC_KEYCLOAK_CLIENT_ID ?? 'bis-ui'
+const AUTH_BYPASS_ENABLED = process.env.NEXT_PUBLIC_AUTH_BYPASS === 'true'
 
 function getAuthorizationEndpoint() {
   return `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/auth`
@@ -158,6 +169,20 @@ function saveTokens(response: TokenResponse) {
   sessionStorage.setItem(STORAGE_KEYS.expiresAt, expiresAt.toString())
 }
 
+function decodeTokenPayload(token: string): Record<string, unknown> | null {
+  const parts = token.split('.')
+  if (parts.length < 2) {
+    return null
+  }
+
+  try {
+    const payloadJson = atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'))
+    return JSON.parse(payloadJson) as Record<string, unknown>
+  } catch {
+    return null
+  }
+}
+
 function getStoredToken() {
   const token = sessionStorage.getItem(STORAGE_KEYS.accessToken)
   const expiresAtRaw = sessionStorage.getItem(STORAGE_KEYS.expiresAt)
@@ -168,6 +193,34 @@ function getStoredToken() {
     token,
     expiresAt: Number(expiresAtRaw),
   }
+}
+
+function getBypassRoles() {
+  const raw = sessionStorage.getItem(STORAGE_KEYS.bypassRoles)
+  if (!raw) {
+    return [] as AppRole[]
+  }
+
+  try {
+    const parsed = JSON.parse(raw) as string[]
+    return normalizeRoles(parsed)
+  } catch {
+    return []
+  }
+}
+
+function getBypassUser(): AuthUser | null {
+  if (!AUTH_BYPASS_ENABLED) {
+    return null
+  }
+
+  const username = sessionStorage.getItem(STORAGE_KEYS.bypassUsername)
+  const roles = getBypassRoles()
+  if (!username || roles.length === 0) {
+    return null
+  }
+
+  return { username, roles }
 }
 
 async function refreshAccessToken() {
@@ -204,7 +257,46 @@ async function refreshAccessToken() {
   return tokens.access_token
 }
 
+export function isAuthBypassEnabled() {
+  return AUTH_BYPASS_ENABLED
+}
+
+export function startBypassSession(username: string, roles: string[]) {
+  const normalizedRoles = normalizeRoles(roles)
+  if (!AUTH_BYPASS_ENABLED) {
+    throw new Error('Keycloak bypass is not enabled')
+  }
+
+  if (!username.trim() || normalizedRoles.length === 0) {
+    throw new Error('Username and at least one role are required')
+  }
+
+  clearAuthSession()
+  sessionStorage.setItem(STORAGE_KEYS.bypassUsername, username.trim())
+  sessionStorage.setItem(STORAGE_KEYS.bypassRoles, JSON.stringify(normalizedRoles))
+  sessionStorage.setItem(STORAGE_KEYS.activeRole, normalizedRoles[0])
+}
+
+export function getActiveRole(): AppRole | null {
+  const roleRaw = sessionStorage.getItem(STORAGE_KEYS.activeRole)
+  if (!roleRaw) {
+    return null
+  }
+
+  const [role] = normalizeRoles([roleRaw])
+  return role ?? null
+}
+
+export function setActiveRole(role: AppRole) {
+  sessionStorage.setItem(STORAGE_KEYS.activeRole, role)
+}
+
 export async function getAccessToken() {
+  const bypassUser = getBypassUser()
+  if (bypassUser) {
+    return 'bypass-token'
+  }
+
   const stored = getStoredToken()
   if (!stored) {
     return null
@@ -222,6 +314,10 @@ export function clearAuthSession() {
 }
 
 export async function beginKeycloakLogin() {
+  if (AUTH_BYPASS_ENABLED) {
+    throw new Error('Keycloak login is bypassed in this environment')
+  }
+
   const state = randomString(32)
   const verifier = randomString(64)
   const challenge = await createPkceChallenge(verifier)
@@ -242,6 +338,10 @@ export async function beginKeycloakLogin() {
 }
 
 export async function handleAuthCallback() {
+  if (AUTH_BYPASS_ENABLED) {
+    return false
+  }
+
   const url = new URL(window.location.href)
   const code = url.searchParams.get('code')
   const state = url.searchParams.get('state')
@@ -281,6 +381,11 @@ export async function handleAuthCallback() {
   const tokens = (await res.json()) as TokenResponse
   saveTokens(tokens)
 
+  const roles = await getCurrentUserRoles()
+  if (roles.length > 0) {
+    sessionStorage.setItem(STORAGE_KEYS.activeRole, roles[0])
+  }
+
   sessionStorage.removeItem(STORAGE_KEYS.state)
   sessionStorage.removeItem(STORAGE_KEYS.pkceVerifier)
   window.history.replaceState({}, '', '/login')
@@ -288,6 +393,10 @@ export async function handleAuthCallback() {
 }
 
 export async function authFetch(input: string, init?: RequestInit) {
+  if (getBypassUser()) {
+    return fetch(input, init)
+  }
+
   const token = await getAccessToken()
   if (!token) {
     clearAuthSession()
@@ -308,28 +417,87 @@ export async function authFetch(input: string, init?: RequestInit) {
 }
 
 export async function getCurrentUsername() {
+  const bypassUser = getBypassUser()
+  if (bypassUser) {
+    return bypassUser.username
+  }
+
   const token = await getAccessToken()
   if (!token) {
     return null
   }
 
-  const parts = token.split('.')
-  if (parts.length < 2) {
+  const payload = decodeTokenPayload(token)
+  if (!payload) {
     return null
   }
 
-  try {
-    const payloadJson = atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'))
-    const payload = JSON.parse(payloadJson) as Record<string, unknown>
-    return (payload.preferred_username as string) || (payload.sub as string) || null
-  } catch {
+  return (payload.preferred_username as string) || (payload.sub as string) || null
+}
+
+export async function getCurrentUserRoles() {
+  const bypassUser = getBypassUser()
+  if (bypassUser) {
+    return bypassUser.roles
+  }
+
+  const token = await getAccessToken()
+  if (!token) {
+    return [] as AppRole[]
+  }
+
+  const payload = decodeTokenPayload(token)
+  if (!payload) {
+    return [] as AppRole[]
+  }
+
+  const realmAccess = payload.realm_access as { roles?: string[] } | undefined
+  const realmRoles = Array.isArray(realmAccess?.roles) ? realmAccess.roles : []
+
+  const resourceAccess = payload.resource_access as Record<string, { roles?: string[] }> | undefined
+  const clientRolesRaw = resourceAccess?.[KEYCLOAK_CLIENT_ID]?.roles
+  const clientRoles = Array.isArray(clientRolesRaw) ? clientRolesRaw : []
+
+  return normalizeRoles([...realmRoles, ...clientRoles])
+}
+
+export async function getCurrentUser() {
+  const username = await getCurrentUsername()
+  if (!username) {
     return null
   }
+
+  const roles = await getCurrentUserRoles()
+  if (roles.length === 0) {
+    return { username, roles, activeRole: null }
+  }
+
+  const activeRole = getActiveRole()
+  if (!activeRole || !roles.includes(activeRole)) {
+    sessionStorage.setItem(STORAGE_KEYS.activeRole, roles[0])
+    return { username, roles, activeRole: roles[0] }
+  }
+
+  return { username, roles, activeRole }
+}
+
+export async function canAccessAppModule(module: AppModule) {
+  const user = await getCurrentUser()
+  if (!user) {
+    return false
+  }
+  return canAccessModule(user.roles, module, user.activeRole)
 }
 
 export function logout() {
+  const isBypassSession = Boolean(getBypassUser())
   const idToken = sessionStorage.getItem(STORAGE_KEYS.idToken)
   clearAuthSession()
+
+  if (isBypassSession || AUTH_BYPASS_ENABLED) {
+    window.location.href = '/login'
+    return
+  }
 
   const logoutUrl = new URL(getLogoutEndpoint())
   logoutUrl.searchParams.set('client_id', KEYCLOAK_CLIENT_ID)
