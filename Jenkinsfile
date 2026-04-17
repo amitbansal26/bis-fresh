@@ -66,7 +66,11 @@ pipeline {
             git config user.name "jenkins-bot"
             git config user.email "jenkins-bot@local"
 
-            sed -i -E "s/(newTag: ).*/\\1${IMAGE_TAG}/g" ${GITOPS_FILE}
+            awk -v tag="${IMAGE_TAG}" '
+              /^images:/ {in_images=1}
+              in_images && $1=="newTag:" {$2=tag}
+              {print}
+            ' ${GITOPS_FILE} > ${GITOPS_FILE}.tmp && mv ${GITOPS_FILE}.tmp ${GITOPS_FILE}
 
             git add ${GITOPS_FILE}
             if git diff --cached --quiet; then
@@ -76,8 +80,16 @@ pipeline {
 
             git commit -m "ci: update Kubernetes image tags to ${IMAGE_TAG}"
 
-            REMOTE_URL=$(git config --get remote.origin.url | sed -E 's#https://##')
-            git push "https://${GIT_USER}:${GIT_TOKEN}@${REMOTE_URL}" HEAD:${BRANCH_NAME}
+            REMOTE_URL=$(git config --get remote.origin.url)
+            if [[ "${REMOTE_URL}" =~ ^git@github.com:(.+)/(.+)\\.git$ ]]; then
+              PUSH_URL="https://${GIT_USER}:${GIT_TOKEN}@github.com/${BASH_REMATCH[1]}/${BASH_REMATCH[2]}.git"
+            elif [[ "${REMOTE_URL}" =~ ^https://github.com/(.+)/(.+)\\.git$ ]]; then
+              PUSH_URL="https://${GIT_USER}:${GIT_TOKEN}@github.com/${BASH_REMATCH[1]}/${BASH_REMATCH[2]}.git"
+            else
+              echo "Unsupported remote URL format: ${REMOTE_URL}"
+              exit 1
+            fi
+            git push "${PUSH_URL}" HEAD:${BRANCH_NAME}
           '''
         }
       }

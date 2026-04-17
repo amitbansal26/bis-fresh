@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: bis-identity-service
-          image: bis-identity-service:latest
+          image: bis-identity-service:0.0.0
           ports:
             - containerPort: 8081
               name: http
@@ -74,7 +74,7 @@ spec:
     spec:
       containers:
         - name: bis-certification-service
-          image: bis-certification-service:latest
+          image: bis-certification-service:0.0.0
           ports:
             - containerPort: 8082
               name: http
@@ -134,7 +134,7 @@ spec:
     spec:
       containers:
         - name: bis-laboratory-service
-          image: bis-laboratory-service:latest
+          image: bis-laboratory-service:0.0.0
           ports:
             - containerPort: 8083
               name: http
@@ -194,7 +194,7 @@ spec:
     spec:
       containers:
         - name: bis-operations-service
-          image: bis-operations-service:latest
+          image: bis-operations-service:0.0.0
           ports:
             - containerPort: 8084
               name: http
@@ -254,7 +254,7 @@ spec:
     spec:
       containers:
         - name: bis-integration-service
-          image: bis-integration-service:latest
+          image: bis-integration-service:0.0.0
           ports:
             - containerPort: 8085
               name: http
@@ -314,7 +314,7 @@ spec:
     spec:
       containers:
         - name: bis-master-data-service
-          image: bis-master-data-service:latest
+          image: bis-master-data-service:0.0.0
           ports:
             - containerPort: 8086
               name: http

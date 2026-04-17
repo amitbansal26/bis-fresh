@@ -20,7 +20,7 @@ This repository now includes a GitOps-style CI/CD flow:
 - Kubernetes cluster
 - ArgoCD installed in cluster
 - Jenkins with:
-  - Docker daemon access (for `spring-boot:build-image`)
+  - Container build runtime for `spring-boot:build-image` (host Docker socket, DinD, or a Kubernetes pod template with Docker/Buildpacks support)
   - Maven + JDK 17
   - SCM access to this repository
 - Container registry access (example uses GHCR)
@@ -36,6 +36,7 @@ Before using the pipeline, update these placeholders:
   - `targetRevision` (branch used for GitOps)
 
 Also replace default credentials in `deploy/k8s/secret.yaml`.
+For production, replace this Secret with a secure solution (for example Sealed Secrets, External Secrets Operator, or Vault integration).
 
 ## Jenkins credentials required
 
